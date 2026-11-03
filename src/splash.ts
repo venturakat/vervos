@@ -14,7 +14,7 @@ const back = (t: number) => {
 // seconds
 const LETTER_GAP = 0.09, LETTER = 0.5 // v e r v rise in
 const LOGO_AT = 0.3 // the O and S fade in here and their intro starts
-const TAG_AT = 2.5, TAG = 0.5 // tagline
+const TAG_AT = LOGO_AT + (0.8 - LOGO_INTRO[0]), TAG = 0.5 // tagline: fades in as the O starts to rotate (logo time 0.8 s)
 const LOGO_END = LOGO_AT + (LOGO_INTRO[1] - LOGO_INTRO[0])
 const HOLD = 0.35 // a short look at the finished logo
 const FADE_MS = 350

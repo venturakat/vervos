@@ -109,10 +109,12 @@ nav.dock{position:fixed;left:0;right:0;bottom:0;z-index:20;padding-bottom:env(sa
 .tab[aria-selected="true"] .ind{background:var(--accent-soft)}
 :root[data-skin="oreiro"] .tab[aria-selected="true"] .ind{background:var(--surface)}
 /* centre tab: raised accent circle */
-.tab.tab-center .ind{width:56px;height:56px;border-radius:50%;margin-top:-24px;background:var(--accent);color:var(--on-accent);box-shadow:0 0 0 4px var(--bg),0 4px 12px rgba(60,21,40,.28)}
+/* not chosen: soft circle, accent icon, muted label like the other tabs */
+.tab.tab-center .ind{width:56px;height:56px;border-radius:50%;margin-top:-24px;background:var(--accent-soft);color:var(--accent-text);box-shadow:0 0 0 4px var(--bg),0 4px 12px rgba(60,21,40,.18)}
+:root[data-skin="oreiro"] .tab.tab-center .ind{background:var(--surface)}
 .tab.tab-center .ind svg{width:26px;height:26px}
-.tab.tab-center{color:var(--accent-text)}
-.tab.tab-center[aria-selected="true"] .ind{background:var(--accent)}
+/* chosen: filled accent circle, light icon, accent label */
+.tab.tab-center[aria-selected="true"] .ind{background:var(--accent);color:var(--on-accent);box-shadow:0 0 0 4px var(--bg),0 4px 12px rgba(60,21,40,.28)}
 .tab.tab-center:active .ind{transform:scale(.94)}
 .tab:active .ind{transform:scale(.92)}
 .tab:focus-visible{outline:none}

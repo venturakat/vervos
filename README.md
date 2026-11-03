@@ -1,5 +1,7 @@
 # vervos
 
+**Open the app:** https://venturakat.github.io/vervos/
+
 Practicá tus verbos rioplatenses: a phone-first app for practising Rioplatense Spanish (voseo) verb conjugations.
 
 ## What's here

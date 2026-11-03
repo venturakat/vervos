@@ -1,6 +1,7 @@
 // Sideways swipe between the dock tabs (Tablas ↔ Tarjetas ↔ Verbos ↔ Frases ↔ Oreiro).
 // The page follows your finger, slides away, and the next tab slides in.
 // At the first/last tab it only stretches a little and springs back. Header and dock stay put.
+// On Ajustes, swiping right drags the page away and goes back, like the back gesture on iPhone.
 
 /** Is the finger on something that scrolls sideways by itself? Then leave it alone. */
 const inSideScroll = (el: HTMLElement | null) => {
@@ -21,8 +22,12 @@ const set = (el: HTMLElement | null, x: number, o: number, tr = 'none') => {
 }
 
 interface SwipeHooks {
-  /** the visible tab's section, or null when swiping isn't possible (Ajustes, loading screen) */
+  /** the visible section, or null when swiping isn't possible (loading screen) */
   page: () => HTMLElement | null
+  /** true on a page that a right swipe closes (Ajustes) */
+  isBack: () => boolean
+  /** close that page */
+  back: () => void
   /** is there a tab in that direction? 1 = next (swipe left), -1 = previous (swipe right) */
   can: (dir: 1 | -1) => boolean
   /** switch to the tab in that direction */
@@ -30,17 +35,18 @@ interface SwipeHooks {
 }
 
 export function startSwipe(h: SwipeHooks) {
-  let s: { x: number; y: number; t: number; lock?: 'h' | 'v'; el: HTMLElement; dx: number } | null = null
+  let s: { x: number; y: number; t: number; lock?: 'h' | 'v'; el: HTMLElement; dx: number; back: boolean } | null = null
 
   document.addEventListener('touchstart', (e) => {
     s = null
     const t = e.target as HTMLElement
     const el = h.page()
-    if (!el || e.touches.length > 1 || !el.contains(t) || inSideScroll(t)) return
+    // on Ajustes the whole screen works (the page itself is short); on tabs, only the page below the header
+    if (!el || e.touches.length > 1 || (!h.isBack() && !el.contains(t)) || inSideScroll(t)) return
     // a field you're typing in keeps its own touches (moving the cursor, selecting)
     const field = t.closest('input, textarea, select')
     if (field && field === document.activeElement) return
-    s = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now(), el, dx: 0 }
+    s = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now(), el, dx: 0, back: h.isBack() }
   }, { passive: true })
 
   document.addEventListener('touchmove', (e) => {
@@ -53,6 +59,10 @@ export function startSwipe(h: SwipeHooks) {
     if (s.lock !== 'h') return
     e.preventDefault() // no page scrolling while swiping sideways
     s.dx = dx
+    if (s.back) {
+      set(s.el, Math.max(0, dx), 1) // only to the right
+      return
+    }
     const can = h.can(dx < 0 ? 1 : -1)
     set(s.el, can ? dx : dx * 0.22, can ? 1 - Math.min(0.4, Math.abs(dx) / 800) : 1)
   }, { passive: false })
@@ -64,6 +74,22 @@ export function startSwipe(h: SwipeHooks) {
     const dir: 1 | -1 = g.dx < 0 ? 1 : -1
     const w = window.innerWidth
     const speed = Math.abs(g.dx) / Math.max(1, Date.now() - g.t)
+    if (g.back) {
+      if (!(g.dx > w * 0.3 || (speed > 0.35 && g.dx > 30))) {
+        set(g.el, 0, 1, 'transform .22s cubic-bezier(.2,.9,.3,1.2)') // spring back
+        return
+      }
+      set(g.el, w, 1, 'transform .2s ease-in')
+      setTimeout(() => {
+        set(g.el, 0, 1)
+        h.back()
+        const prev = h.page()
+        set(prev, -w * 0.25, 0.4) // the page underneath slides in from the left
+        requestAnimationFrame(() => requestAnimationFrame(() => set(prev, 0, 1, 'transform .22s cubic-bezier(.2,.8,.2,1), opacity .18s ease-out')))
+        setTimeout(() => set(prev, 0, 1, ''), 270)
+      }, 190)
+      return
+    }
     if (!h.can(dir) || !(Math.abs(g.dx) > w * 0.2 || (speed > 0.35 && Math.abs(g.dx) > 30))) {
       set(g.el, 0, 1, 'transform .22s cubic-bezier(.2,.9,.3,1.2), opacity .16s') // spring back
       return

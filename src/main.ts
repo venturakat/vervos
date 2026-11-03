@@ -76,10 +76,12 @@ document.addEventListener('click', (e) => {
 $('#close-settings').onclick = () => show(current)
 $('#open-settings').onclick = () => show('ajustes')
 
-// swipe sideways between the dock tabs
+// swipe sideways between the dock tabs; swipe right on Ajustes to go back
 const tabIndex = () => VIEWS.indexOf(shown as (typeof VIEWS)[number])
 startSwipe({
-  page: () => (shown === 'ajustes' || document.getElementById('splash') ? null : $('#view-' + shown)),
+  page: () => (document.getElementById('splash') ? null : $('#view-' + shown)),
+  isBack: () => shown === 'ajustes',
+  back: () => show(current),
   can: (dir) => tabIndex() >= 0 && !!VIEWS[tabIndex() + dir],
   go: (dir) => show(VIEWS[tabIndex() + dir]),
 })

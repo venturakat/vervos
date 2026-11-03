@@ -37,7 +37,7 @@
 ## Header behaviour (code notes)
 - `.appbar` is fixed; `.appbar-space` keeps the page clear. Compact state (`.is-compact`) kicks in after ~30 px of scroll; tapping the compact bubble scrolls to the top.
 - Logo animation lives in `src/header.ts` (keyframe tracks in seconds, `createLogoAnim(sfx)` drives either copy of the wordmark: header or loading screen `-sp`): the intro 0.35→3.2 s plays on the loading screen; tap on the header wordmark plays 4.8→5.76 (bubble tucks in, O spins back) then 0.5→3.2. Skipped with reduced motion.
-- Swipe sideways between the dock tabs (`src/swipe.ts`, same feel as nowwhat): the page follows the finger, slides away and the next tab slides in; at Tablas / Oreiro it stretches and springs back. Not on Ajustes or while the loading screen shows; a focused answer field keeps its own touches.
+- Swipe sideways between the dock tabs (`src/swipe.ts`, same feel as nowwhat): the page follows the finger, slides away and the next tab slides in; at Tablas / Oreiro it stretches and springs back. On Ajustes, a swipe right (anywhere on the screen) drags the page away and goes back, like the iPhone back gesture. Not while the loading screen shows; a focused answer field keeps its own touches.
 - Dock: `nav.dock` fixed at the bottom; buttons are `.tab[data-view]`, hidden on the settings view. Centre tab `.tab-center` = Verbos (open-book icon) in a raised circle: soft (accent-soft, surface on the Oreiro skin) with an accent icon when not chosen, filled accent with a light icon when chosen.
 
 ## Tablas layout

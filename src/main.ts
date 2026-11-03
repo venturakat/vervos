@@ -3,6 +3,7 @@ import { $, esc, store } from './lib'
 import { ordered } from './state'
 import { initAppBar, initLogo } from './header'
 import { runSplash } from './splash'
+import { startSwipe } from './swipe'
 import { initTablas, renderTbl } from './tabs/tablas'
 import { buildDeck, initTarjetas } from './tabs/tarjetas'
 import { initQuizzes } from './tabs/quiz'
@@ -15,6 +16,7 @@ const isView = (v: unknown): v is (typeof VIEWS)[number] => VIEWS.includes(v as 
 
 let current: View = store.get<View>('view', 'tablas')
 if (!isView(current)) current = 'tablas'
+let shown: View = current // what's on screen now (can be Ajustes)
 
 initTablas()
 initTarjetas()
@@ -44,6 +46,7 @@ function renderSummaries() {
 function show(view: View) {
   if (current === 'verbos' && view !== 'verbos' && commitVerbs()) rebuildAll()
   if (view === 'verbos' && current !== 'verbos') openVerbs()
+  shown = view
   if (view !== 'ajustes') {
     current = view
     store.set('view', view)
@@ -72,6 +75,14 @@ document.addEventListener('click', (e) => {
 })
 $('#close-settings').onclick = () => show(current)
 $('#open-settings').onclick = () => show('ajustes')
+
+// swipe sideways between the dock tabs
+const tabIndex = () => VIEWS.indexOf(shown as (typeof VIEWS)[number])
+startSwipe({
+  page: () => (shown === 'ajustes' || document.getElementById('splash') ? null : $('#view-' + shown)),
+  can: (dir) => tabIndex() >= 0 && !!VIEWS[tabIndex() + dir],
+  go: (dir) => show(VIEWS[tabIndex() + dir]),
+})
 
 /* ---------- boot ---------- */
 runSplash()

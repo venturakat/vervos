@@ -14,7 +14,8 @@
 1. New logo — done.
 2. Done — sticky header: full wordmark + subtitle + settings; shrinks on scroll to bubble logo + settings.
 3. Done — bottom dock with icon + title tabs: Tablas, Tarjetas, Verbos (centre), Frases, Oreiro.
-4. Done — header logo animation: plays once on open (plain O → bubble); on tap the bubble tucks in, the O spins back to plain, then plays forward to the bubble again. Respects reduced motion.
+4. Done — header logo animation: on tap the bubble tucks in, the O spins back to plain, then plays forward to the bubble again. Respects reduced motion.
+5. Done (Nov 2026) — animated loading screen instead of the logo animating on start: Oreiro Dark background, "ver" + "v" rise in one by one, then the logo intro (plain O → bubble, S wiggles), the tagline fades in, and it fades away (~3.5 s, tap to skip). Markup + critical CSS in `index.html` (shows while the app loads), animation in `src/splash.ts`.
 
 ## Data format (src/data)
 - `verbs.ts` → `V_CORE` / `V_EXTRA`: the verbs (merged into `V` in `grammar.ts`). Each tense has 5 forms (yo, vos, él, nosotros, ellos); imperativo has the vos form only.
@@ -35,7 +36,7 @@
 
 ## Header behaviour (code notes)
 - `.appbar` is fixed; `.appbar-space` keeps the page clear. Compact state (`.is-compact`) kicks in after ~30 px of scroll; tapping the compact bubble scrolls to the top.
-- Logo animation lives in `src/header.ts` (keyframe tracks in seconds): intro plays 0.35→3.2 s once on open; tap on the wordmark plays 4.8→5.76 (bubble tucks in, O spins back) then 0.5→3.2. Skipped with reduced motion.
+- Logo animation lives in `src/header.ts` (keyframe tracks in seconds, `createLogoAnim(sfx)` drives either copy of the wordmark: header or loading screen `-sp`): the intro 0.35→3.2 s plays on the loading screen; tap on the header wordmark plays 4.8→5.76 (bubble tucks in, O spins back) then 0.5→3.2. Skipped with reduced motion.
 - Dock: `nav.dock` fixed at the bottom; buttons are `.tab[data-view]`, hidden on the settings view. Centre tab `.tab-center` = Verbos (open-book icon) in a raised accent circle.
 
 ## Tablas layout

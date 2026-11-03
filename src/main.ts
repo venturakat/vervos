@@ -2,6 +2,7 @@ import './styles.css'
 import { $, esc, store } from './lib'
 import { ordered } from './state'
 import { initAppBar, initLogo } from './header'
+import { runSplash } from './splash'
 import { initTablas, renderTbl } from './tabs/tablas'
 import { buildDeck, initTarjetas } from './tabs/tarjetas'
 import { initQuizzes } from './tabs/quiz'
@@ -21,7 +22,7 @@ const { frases, oreiro } = initQuizzes()
 initVerbos()
 initAjustes()
 initAppBar()
-const logo = initLogo()
+initLogo()
 
 function rebuildAll() {
   renderTbl()
@@ -73,9 +74,9 @@ $('#close-settings').onclick = () => show(current)
 $('#open-settings').onclick = () => show('ajustes')
 
 /* ---------- boot ---------- */
+runSplash()
 rebuildAll()
 const hash = location.hash.slice(1)
 const start: View = isView(hash) ? hash : current
 openVerbs()
 show(start)
-logo.intro()

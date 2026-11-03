@@ -1,4 +1,4 @@
-// App bar: compact on scroll, and the wordmark animation (intro once, replay on tap)
+// App bar: compact on scroll, and the wordmark animation (shared with the loading screen)
 import { $, reducedMotion } from './lib'
 
 export function initAppBar() {
@@ -27,7 +27,7 @@ export function initAppBar() {
 
 type Track = [time: number, value: number][]
 
-// Keyframe tracks in seconds. Intro plays 0.35→3.2 once; tap plays 4.8→5.76 (bubble tucks in, O spins back) then 0.5→3.2.
+// Keyframe tracks in seconds. Intro 0.35→3.2 (plays on the loading screen); tap plays 4.8→5.76 (bubble tucks in, O spins back) then 0.5→3.2.
 const TRACKS: Record<string, Track> = {
   spin: [[0, -90], [0.6, -90], [0.8, -102], [1.15, 12], [1.35, -5], [1.5, 2], [1.62, 0], [5.0, 0], [5.12, 6], [5.42, -98], [5.55, -87], [5.66, -91], [5.76, -90]],
   hopY: [[0, 0], [0.8, 0], [0.98, -30], [1.15, 0], [2.45, 0], [2.62, -18], [2.78, 0], [5.12, 0], [5.3, -30], [5.45, 0]],
@@ -53,9 +53,9 @@ const val = (k: string, t: number) => {
   return a[a.length - 1][1]
 }
 
-export function initLogo() {
-  const hop = $('#wm-hop'), spin = $('#wm-spin'), pop = $('#wm-pop'), tail = $('#wm-tail'), s = $('#wm-s')
-  const OX = 748.97, OY = 89.28, OB = 176, SX = 926, SB = 178.56, REST = 3.2
+/** Logo animation for one copy of the wordmark SVG. sfx picks the copy: '' = header, '-sp' = loading screen */
+export function createLogoAnim(sfx = '') {
+  const hop = $('#wm-hop' + sfx), spin = $('#wm-spin' + sfx), pop = $('#wm-pop' + sfx), tail = $('#wm-tail' + sfx), s = $('#wm-s' + sfx)
   function render(t: number) {
     hop.setAttribute('transform', `translate(${OX} ${OB + val('hopY', t)}) scale(${val('hopSx', t)} ${val('hopSy', t)}) translate(${-OX} ${-OB})`)
     spin.setAttribute('transform', `rotate(${val('spin', t)} ${OX} ${OY})`)
@@ -63,6 +63,17 @@ export function initLogo() {
     tail.setAttribute('transform', `translate(722 118) rotate(${val('tailR', t)}) scale(${Math.max(0.0001, val('tailS', t))}) translate(-722 -118)`)
     s.setAttribute('transform', `translate(${val('sX', t) + SX} ${SB}) rotate(${val('sRot', t)}) scale(${val('sSx', t)} ${val('sSy', t)}) translate(${-SX} ${-SB})`)
   }
+  return { render }
+}
+const OX = 748.97, OY = 89.28, OB = 176, SX = 926, SB = 178.56
+/** Time where the logo rests (plain O turned into the bubble) */
+export const LOGO_REST = 3.2
+/** The intro part of the keyframes: plain O → bubble */
+export const LOGO_INTRO: [number, number] = [0.35, LOGO_REST]
+
+/** Header wordmark: sits still at rest; on tap the bubble tucks in, the O spins back, then plays forward to the bubble again */
+export function initLogo() {
+  const { render } = createLogoAnim()
   const reduce = reducedMotion()
   let busy = false
   function play(segs: [number, number][]) {
@@ -86,13 +97,6 @@ export function initLogo() {
     }
     requestAnimationFrame(step)
   }
-  render(REST)
-  $('#wm-btn').addEventListener('click', () => play([[4.8, 5.76], [0.5, REST]]))
-  return {
-    intro() {
-      if (reduce) return
-      render(0)
-      setTimeout(() => play([[0.35, REST]]), 250)
-    },
-  }
+  render(LOGO_REST)
+  $('#wm-btn').addEventListener('click', () => play([[4.8, 5.76], [0.5, LOGO_REST]]))
 }
